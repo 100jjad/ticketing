@@ -1,0 +1,176 @@
+<resources>
+    <string name="app_name">TSAPP</string>
+    <string name="edittext_hint"><font size="18">Hint here!</font></string>
+    <string name="slide_to_cancel">"Slide to cancel"</string>
+    <string name="title_activity_settings">Settings</string>
+
+    <!-- Strings related to Settings -->
+
+    <!-- Example General settings -->
+    <string name="pref_header_general">General</string>
+
+    <string name="pref_title_social_recommendations">Enable social recommendations</string>
+    <string name="pref_description_social_recommendations">Recommendations for people to contact
+        based on your message history
+    </string>
+
+    <string name="pref_title_display_name">Display name</string>
+    <string name="pref_default_display_name">John Smith</string>
+
+    <string name="pref_title_add_friends_to_messages">Add friends to messages</string>
+    <string-array name="pref_example_list_titles">
+        <item>Always</item>
+        <item>When possible</item>
+        <item>Never</item>
+    </string-array>
+    <string-array name="pref_example_list_values">
+        <item>1</item>
+        <item>0</item>
+        <item>-1</item>
+    </string-array>
+
+    <!-- Example settings for Data & Sync -->
+    <string name="pref_header_data_sync">Data &amp; sync</string>
+
+    <string name="pref_title_sync_frequency">Sync frequency</string>
+    <string-array name="pref_sync_frequency_titles">
+        <item>15 minutes</item>
+        <item>30 minutes</item>
+        <item>1 hour</item>
+        <item>3 hours</item>
+        <item>6 hours</item>
+        <item>Never</item>
+    </string-array>
+    <string-array name="pref_sync_frequency_values">
+        <item>15</item>
+        <item>30</item>
+        <item>60</item>
+        <item>180</item>
+        <item>360</item>
+        <item>-1</item>
+    </string-array>
+
+    <string-array name="list_preference_entries">
+        <item>Entry 1</item>
+        <item>Entry 2</item>
+        <item>Entry 3</item>
+    </string-array>
+
+    <string-array name="list_preference_entry_values">
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+    </string-array>
+
+    <string-array name="multi_select_list_preference_default_value" />
+
+    <string name="pref_title_system_sync_settings">System sync settings</string>
+
+    <!-- Example settings for Notifications -->
+    <string name="pref_header_notifications">Notifications</string>
+
+    <string name="pref_title_new_message_notifications">New message notifications</string>
+
+    <string name="pref_title_ringtone">Ringtone</string>
+    <string name="pref_ringtone_silent">Silent</string>
+
+    <string name="pref_title_vibrate">Vibrate</string>
+    <string name="main_title">Ticketing</string>
+    <string name="version">Version</string>
+    <string name="contact_us">Contact Us</string>
+    <string name="customer_portal">Customer Portal</string>
+    <string name="view_web">Visit the Site</string>
+    <string name="email_contact">Contact Via Email</string>
+    <string name="call_us">Contact</string>
+    <string name="developers">Developers</string>
+    <string name="ts_team">Tavanasazan Company\'s app team</string>
+    <string name="address_main">Mashhad-Ayatollah Rafsanjani Highway</string>
+    <string name="address_second">Ayatollah Rafsanjani 2 - Jahed 1 - Plaque 47 Ground floor</string>
+    <string name="choose_language">Language Selection</string>
+    <string name="please_wait">Please Wait</string>
+    <string name="re_enter">Double-click to Enter Date *</string>
+    <string name="increase_amount">Amount of Increase *</string>
+    <string name="number_invoice">Receipt Number *</string>
+    <string name="last_4_digit">The last four digits of the card number *</string>
+    <string name="bank_name">Bank name *</string>
+    <string name="description">Description :</string>
+    <string name="choose_file">Select file</string>
+    <string name="send_request">Submit a request</string>
+    <string name="enter_password">Enter the password</string>
+    <string name="enter_fingerprint">Login with fingerprint</string>
+    <string name="register_user">Create Account</string>
+    <string name="user_name">First Name</string>
+    <string name="user_last_name">Last Name</string>
+    <string name="user_user_name">UserName</string>
+    <string name="name_of_company">Company Name</string>
+    <string name="user_email">Email</string>
+    <string name="user_password">Password</string>
+    <string name="user_confirm_password">Confirm Password</string>
+    <string name="user_phone_number">Mobile</string>
+    <string name="user_home_phone">Phone</string>
+    <string name="country">Country :</string>
+    <string name="state">State :</string>
+    <string name="user_city">City :</string>
+    <string name="user_address">Address</string>
+    <string name="user_receive_email">Receive email notification :</string>
+    <string name="user_yes">Yes</string>
+    <string name="user_no">No</string>
+    <string name="user_receive_sms">Receive sms notification :</string>
+    <string name="user_agree_terms">Agree to Terms of Service</string>
+    <string name="user_enter_captcha">Please enter the number inside the image in the following field</string>
+    <string name="user_register">Register</string>
+    <string name="dashboard_pending_tickets">Checking tickets</string>
+    <string name="c_m_r">C.M.R</string>
+    <string name="pre_invoice">Pre invoices</string>
+    <string name="dashboard_balance">Balance</string>
+    <string name="ticket_send_msg">Enter your message</string>
+    <string name="digit_pass_title">Select Password to enter the application.</string>
+    <string name="internet_payment">Online Payment</string>
+    <string name="bank_invoice">Bank Receipt</string>
+    <string name="payment_amount">Amount of increase of funds</string>
+    <string name="payment_description">Description :</string>
+    <string name="payment_confirm">Submit information</string>
+    <string name="internet_payment_title">Online Payment</string>
+    <string name="pending_tickets">Checking tickets</string>
+    <string name="factor_product_code">Product Code</string>
+    <string name="factor_amount">Number</string>
+    <string name="factor_price_per">Unit Price</string>
+    <string name="factor_final_price">Final Price</string>
+    <string name="rials">Rial</string>
+    <string name="login_to_panel">Login to the User Panel</string>
+    <string name="login_user_name">User Name</string>
+    <string name="login_password">Password</string>
+    <string name="login_forgot_password">Password Recovery</string>
+    <string name="login_register">Register</string>
+    <string name="login_enter">Login</string>
+    <string name="login_enter_captcha">Enter the number of the image</string>
+    <string name="menu_tickets">Tickets</string>
+    <string name="menu_products">Products</string>
+    <string name="menu_increase_amount">Increase Amount</string>
+    <string name="menu_factor">facturee</string>
+    <string name="menu_pre_factor">Invoice</string>
+    <string name="menu_turn_over">Turnover</string>
+    <string name="sale">Discount</string>
+    <string name="final_price">Final Price</string>
+    <string name="count">Number</string>
+    <string name="tax_include">Nine percent VAT</string>
+    <string name="pre_final_price">Total price :</string>
+    <string name="pre_user">User</string>
+    <string name="pre_increase_amount">Increase in inventory</string>
+    <string name="pre_pay_credit">Pay with inventory</string>
+    <string name="pre_remove_pre_factor">Invoice Revocation</string>
+    <string name="pre_online_payment">Online Payment</string>
+    <string name="detail_photo">عکس</string>
+    <string name="detail_food">غذا</string>
+    <string name="detail_product_code">کد محصول :</string>
+    <string name="detail_product_price">قیمت محصول :</string>
+    <string name="detail_sale">تخفیف :</string>
+    <string name="detail_count_buy">تعداد خرید :</string>
+    <string name="detail_add_basket">افزودن به سبد خرید</string>
+    <string name="list_amount_remain">مانده اعتبار :</string>
+    <string name="send_ticket">ارسال تیکت</string>
+    <string name="send_ticket_message">پیام خود را وارد کنید.</string>
+    <string name="basket_total_amount">جمع کل خرید</string>
+
+
+</resources>
