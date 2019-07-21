@@ -1,31 +1,32 @@
-package com.example.ssoheyli.ticketing_newdesign;
+package com.example.ssoheyli.ticketing_newdesign.Financial;
 
-import android.content.Context;
+import android.app.Activity;
+import android.content.Intent;
 import android.graphics.Typeface;
-import android.support.annotation.NonNull;
-import android.support.v4.app.Fragment;
-import android.support.v4.view.PagerAdapter;
+import android.os.Bundle;
+import android.support.annotation.Nullable;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
-import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+
+import com.agrawalsuneet.dotsloader.loaders.LazyLoader;
 import com.example.ssoheyli.ticketing_newdesign.Helpfull.API;
 import com.example.ssoheyli.ticketing_newdesign.Helpfull.Config;
-import com.example.ssoheyli.ticketing_newdesign.Model.Model_Get_dashboard_Cash;
-import com.example.ssoheyli.ticketing_newdesign.Model.Model_Get_dashboard_cmr;
-import com.example.ssoheyli.ticketing_newdesign.Model.Model_Get_dashboard_invoce;
-import com.example.ssoheyli.ticketing_newdesign.Model.Model_Get_dashboard_ticket;
-import com.example.ssoheyli.ticketing_newdesign.Model.Model_Post_dashboard_cmr;
-import com.example.ssoheyli.ticketing_newdesign.Model.Model_Post_dashboard_invoice;
-import com.example.ssoheyli.ticketing_newdesign.Model.Model_Post_dashboard_ticket;
-import com.example.ssoheyli.ticketing_newdesign.Model.dashbord_Model;
+import com.example.ssoheyli.ticketing_newdesign.Increas_Amount;
+import com.example.ssoheyli.ticketing_newdesign.Model.Model_Get_Payment_Inventory;
+import com.example.ssoheyli.ticketing_newdesign.Model.Model_Get_invoice_detail_list;
+import com.example.ssoheyli.ticketing_newdesign.Model.Model_Post_Payment_Inventory;
+import com.example.ssoheyli.ticketing_newdesign.Model.Model_Post_invoice_detail_list;
+import com.example.ssoheyli.ticketing_newdesign.Model.Pre_invoce_detail_list_Model;
+import com.example.ssoheyli.ticketing_newdesign.R;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -33,215 +34,270 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-public class viewpager_adapter_dashbord extends PagerAdapter
+
+/**
+ * Created by s.soheyli on 11/6/2018.
+ */
+
+public class Pre_InvoiceDetailList extends Activity
 {
-    int[] layout ;
-    int res1=0 , res2=0 , res3=0 , res4=0;
-    LayoutInflater layoutInflater;
-    Context context;
-    Fragment[] mFragment;
-    String TAG;
-
-    public viewpager_adapter_dashbord(int[] layout , Context context)
-    {
-        this.layout = layout;
-        this.context = context;
-        layoutInflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-    }
+    RecyclerView rcv;
+    Pre_invoicedetail_Adapter update = new Pre_invoicedetail_Adapter(this);
+    LazyLoader lp;
+    ImageView imvback;
+    TextView txvusername;
+    int total_amount2=0;
+    int amount =0;
+    static int invoice_id = 0;
+    Button btn_increas_amount , btn_payment_by_amount , btn_cancel_invoice , btn_online_payment;
 
     @Override
-    public int getCount()
+    protected void onCreate(@Nullable Bundle savedInstanceState)
     {
-        return layout.length;
-    }
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.pre_invoicelistdetail);
 
-    @Override
-    public boolean isViewFromObject(@NonNull View view, @NonNull Object o)
-    {
-        return view==o;
-    }
+        lp = findViewById(R.id.dl);
+        imvback = findViewById(R.id.ivback);
+        txvusername = findViewById(R.id.tvusername);
 
-    @NonNull
-    @Override
-    public Object instantiateItem(@NonNull final ViewGroup container, int position)
-    {
-        View view = layoutInflater.inflate(layout[position] , container , false);
-        container.addView(view);
-        if(position == 0)
-        {
-            TextView textView = view.findViewById(R.id.tv_value1);
-            TextView textView2 = view.findViewById(R.id.tv_title1);
-            Typeface atf = Typeface.createFromAsset(context.getAssets(), "irsans.ttf");
-            textView.setTypeface(atf);
-            textView2.setTypeface(atf);
-            get_service();
-            textView.setText(""+res1);
-        }
-        else if(position == 1)
-        {
-            TextView textView = view.findViewById(R.id.tv_value2);
-            TextView textView2 = view.findViewById(R.id.tv_title2);
-            Typeface atf = Typeface.createFromAsset(context.getAssets(), "irsans.ttf");
-            textView.setTypeface(atf);
-            textView2.setTypeface(atf);
-            get_ticket();
-            textView.setText(""+res2);
-        }
-        else if(position == 2)
-        {
-            TextView textView = view.findViewById(R.id.tv_value3);
-            TextView textView2 = view.findViewById(R.id.tv_title3);
-            Typeface atf = Typeface.createFromAsset(context.getAssets(), "irsans.ttf");
-            textView.setTypeface(atf);
-            textView2.setTypeface(atf);
-            get_cash();
-            textView.setText(""+res3);
-        }
-        else if(position == 3)
-        {
-            TextView textView = view.findViewById(R.id.tv_value4);
-            TextView textView2 = view.findViewById(R.id.tv_title4);
-            Typeface atf = Typeface.createFromAsset(context.getAssets(), "irsans.ttf");
-            textView.setTypeface(atf);
-            textView2.setTypeface(atf);
-            get_invoice();
-            textView.setText(""+res4);
-        }
-        return view;
-    }
-
-    @Override
-    public void destroyItem(@NonNull ViewGroup container, int position, @NonNull Object object)
-    {
-        View view = (View) object;
-        container.removeView(view);
-    }
-
-
-
-    public void get_service()
-    {
-        Retrofit retrofit2 = new Retrofit.Builder().baseUrl(Config.getBaseUrl()).addConverterFactory(GsonConverterFactory.create()).build();
-        API myApi2 = retrofit2.create(API.class);
-        Model_Post_dashboard_cmr model_post = new Model_Post_dashboard_cmr();
-        model_post.setToken(Config.getToken(context));
-        Call<Model_Get_dashboard_cmr> model = myApi2.get_dashboard_cmr(model_post);
-        model.enqueue(new Callback<Model_Get_dashboard_cmr>() {
+        txvusername.setText(Config.getusername(getApplicationContext()));
+        imvback.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onResponse(Call<Model_Get_dashboard_cmr> call, Response<Model_Get_dashboard_cmr> response) {
-                if(response.isSuccessful())
+            public void onClick(View v) {
+                finish();
+            }
+        });
+        btn_increas_amount = findViewById(R.id.bn_increas_amount);
+        btn_payment_by_amount = findViewById(R.id.bn_payment_by_amount);
+        btn_cancel_invoice = findViewById(R.id.bn_cancel_invoice);
+        btn_online_payment = findViewById(R.id.bn_online_payment);
+
+        Typeface atf = Typeface.createFromAsset(getAssets(), "roboto-regular.ttf");
+        btn_increas_amount.setTypeface(atf);
+        btn_payment_by_amount.setTypeface(atf);
+        btn_cancel_invoice.setTypeface(atf);
+        btn_online_payment.setTypeface(atf);
+
+        invoice_id = Invoice_List.id;
+        btn_cancel_invoice.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                cancel_Invoice();
+            }
+        });
+
+        btn_payment_by_amount.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                if(check_Amount()>0)
                 {
-                    res1 = response.body().getResult();
+                    payment_Inventory();
                 }
                 else
                 {
-                    Log.d(TAG , "Response" + response.toString());
-                    Toast.makeText(context , context.getString(R.string.server_1281) , Toast.LENGTH_LONG).show();
+                    Toast.makeText(Pre_InvoiceDetailList.this, getString(R.string.preinvoice_notenough_credit), Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
+        btn_online_payment.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                Intent intent = new Intent(Pre_InvoiceDetailList.this , Invoice_Bank_Payment.class);
+                startActivity(intent);
+            }
+        });
+
+
+        btn_increas_amount.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                Intent intent = new Intent(Pre_InvoiceDetailList.this , Increas_Amount.class);
+                startActivity(intent);
+            }
+        });
+
+
+        rcv = findViewById(R.id.rv1);
+        get_detail_invoice_list();
+
+    }
+
+
+
+    public void get_detail_invoice_list()
+    {
+        Retrofit retrofit2 = new Retrofit.Builder().baseUrl(Config.getBaseUrl()).addConverterFactory(GsonConverterFactory.create()).build();
+        API api = retrofit2.create(API.class);
+        Model_Post_invoice_detail_list model_post = new Model_Post_invoice_detail_list();
+        model_post.setInvoice_id(Invoice_List.id);
+        model_post.setToken(Config.getToken(getApplicationContext()));
+        Call<List<Model_Get_invoice_detail_list>> model = api.get_invoice_detail_list(model_post);
+        model.enqueue(new Callback<List<Model_Get_invoice_detail_list>>()
+        {
+            @Override
+            public void onResponse(Call<List<Model_Get_invoice_detail_list>> call, Response<List<Model_Get_invoice_detail_list>> response)
+            {
+                lp.setVisibility(View.INVISIBLE);
+                if (response.isSuccessful())
+                {
+                    List<Model_Get_invoice_detail_list> list;
+                    list = response.body();
+                    String price ="" , discount = "" , total_amount = "";
+
+                    ArrayList<Pre_invoce_detail_list_Model> temp;
+                    temp = new ArrayList<>();
+                    for (int i=0 ; i<list.size() ; i++)
+                    {
+                        price = edit_price(""+list.get(i).getPrice());
+                        discount = edit_price(""+list.get(i).getDiscount());
+                        total_amount = edit_price(""+list.get(i).getTotal_amount());
+                        Pre_invoce_detail_list_Model enrty = new Pre_invoce_detail_list_Model(list.get(i).getName() , price , discount , list.get(i).getNumber() , total_amount);
+                        temp.add(enrty);
+                    }
+
+                    update.entries = new ArrayList<>(temp);
+                    rcv = (RecyclerView)findViewById(R.id.rv1);
+                    rcv.setLayoutManager(new StaggeredGridLayoutManager(1 , StaggeredGridLayoutManager.VERTICAL));
+                    update.notifyDataSetChanged();
+                    rcv.setAdapter(update);
+                }
+                else
+                {
+                    Toast.makeText(Pre_InvoiceDetailList.this, getString(R.string.server_1041), Toast.LENGTH_SHORT).show();
+
                 }
             }
 
             @Override
-            public void onFailure(Call<Model_Get_dashboard_cmr> call, Throwable t)
+            public void onFailure(Call<List<Model_Get_invoice_detail_list>> call, Throwable t)
             {
-//                Toast.makeText(context, ""+t.toString(), Toast.LENGTH_SHORT).show();
-                Toast.makeText(context , context.getString(R.string.server_1282) , Toast.LENGTH_LONG).show();
+                lp.setVisibility(View.INVISIBLE);
+                Toast.makeText(Pre_InvoiceDetailList.this, getString(R.string.server_1042), Toast.LENGTH_SHORT).show();
+            }
+        });
+
+
+    }
+
+    public void payment_Inventory()
+    {
+        Retrofit retrofit2 = new Retrofit.Builder().baseUrl(Config.getBaseUrl()).addConverterFactory(GsonConverterFactory.create()).build();
+        API api = retrofit2.create(API.class);
+        Model_Post_Payment_Inventory model_post = new Model_Post_Payment_Inventory();
+        model_post.setInvoice_id(Invoice_List.id);
+        model_post.setToken(Config.getToken(getApplicationContext()));
+        Call<Model_Get_Payment_Inventory> model = api.payment_Inventory(model_post);
+        model.enqueue(new Callback<Model_Get_Payment_Inventory>()
+        {
+            @Override
+            public void onResponse(Call<Model_Get_Payment_Inventory> call, Response<Model_Get_Payment_Inventory> response)
+            {
+                if(response.isSuccessful())
+                {
+                    Toast.makeText(Pre_InvoiceDetailList.this, ""+response.body().getMessage(), Toast.LENGTH_SHORT).show();
+                    Intent intent = new Intent(Pre_InvoiceDetailList.this , Factor_List.class);
+                    startActivity(intent);
+                }
+                else
+                {
+                    Toast.makeText(Pre_InvoiceDetailList.this, getString(R.string.server_1561), Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Model_Get_Payment_Inventory> call, Throwable t)
+            {
+                Toast.makeText(Pre_InvoiceDetailList.this, getString(R.string.server_1562), Toast.LENGTH_SHORT).show();
             }
         });
 
     }
 
-    public void get_ticket()
+    public void cancel_Invoice()
     {
-
         Retrofit retrofit2 = new Retrofit.Builder().baseUrl(Config.getBaseUrl()).addConverterFactory(GsonConverterFactory.create()).build();
-        API myApi2 = retrofit2.create(API.class);
-        Model_Post_dashboard_ticket model_post = new Model_Post_dashboard_ticket();
-        model_post.setCustomerId(Config.getuserid(context));
-        Call<Model_Get_dashboard_ticket> model = myApi2.get_dashboard_ticket(model_post);
-        model.enqueue(new Callback<Model_Get_dashboard_ticket>() {
+        API api = retrofit2.create(API.class);
+        Model_Post_Payment_Inventory model_post = new Model_Post_Payment_Inventory();
+        model_post.setInvoice_id(Invoice_List.id);
+        model_post.setToken(Config.getToken(getApplicationContext()));
+        Call<Model_Get_Payment_Inventory> model = api.cancel_invoice(model_post);
+        model.enqueue(new Callback<Model_Get_Payment_Inventory>()
+        {
             @Override
-            public void onResponse(Call<Model_Get_dashboard_ticket> call, Response<Model_Get_dashboard_ticket> response)
+            public void onResponse(Call<Model_Get_Payment_Inventory> call, Response<Model_Get_Payment_Inventory> response)
             {
                 if(response.isSuccessful())
                 {
-                    res2 = response.body().getResult();
+                    Toast.makeText(Pre_InvoiceDetailList.this, ""+response.body().getMessage(), Toast.LENGTH_SHORT).show();
+                    finish();
                 }
                 else
                 {
-                    Log.d(TAG , "Response" + response.toString());
-                    Toast.makeText(context , context.getString(R.string.server_1291) , Toast.LENGTH_LONG).show();
+                    Toast.makeText(Pre_InvoiceDetailList.this, getString(R.string.server_1571), Toast.LENGTH_SHORT).show();
                 }
             }
 
             @Override
-            public void onFailure(Call<Model_Get_dashboard_ticket> call, Throwable t)
+            public void onFailure(Call<Model_Get_Payment_Inventory> call, Throwable t)
             {
-//                Toast.makeText(context, ""+t.toString(), Toast.LENGTH_SHORT).show();
-                Toast.makeText(context , context.getString(R.string.server_1292) , Toast.LENGTH_LONG).show();
+                Toast.makeText(Pre_InvoiceDetailList.this, getString(R.string.server_1572), Toast.LENGTH_SHORT).show();
             }
         });
     }
 
-    public void get_cash()
+    public int check_Amount()
     {
         Retrofit retrofit2 = new Retrofit.Builder().baseUrl(Config.getBaseUrl()).addConverterFactory(GsonConverterFactory.create()).build();
-        API myApi2 = retrofit2.create(API.class);
-        Model_Post_dashboard_cmr model_post = new Model_Post_dashboard_cmr();
-        model_post.setToken(Config.getToken(context));
-        Call<Model_Get_dashboard_Cash> model = myApi2.get_dashboard_cash(model_post);
-        model.enqueue(new Callback<Model_Get_dashboard_Cash>() {
+        API api = retrofit2.create(API.class);
+        Model_Post_Payment_Inventory model_post = new Model_Post_Payment_Inventory();
+        model_post.setInvoice_id(Invoice_List.id);
+        model_post.setToken(Config.getToken(getApplicationContext()));
+        Call<Model_Get_Payment_Inventory> model = api.check_Inventory(model_post);
+        model.enqueue(new Callback<Model_Get_Payment_Inventory>()
+        {
             @Override
-            public void onResponse(Call<Model_Get_dashboard_Cash> call, Response<Model_Get_dashboard_Cash> response)
+            public void onResponse(Call<Model_Get_Payment_Inventory> call, Response<Model_Get_Payment_Inventory> response)
             {
                 if(response.isSuccessful())
                 {
-                    res3 = response.body().getResultDouble();
+                    amount = response.body().getAmount();
                 }
                 else
                 {
-                    Toast.makeText(context , context.getString(R.string.server_1301) , Toast.LENGTH_LONG).show();
+                    Toast.makeText(Pre_InvoiceDetailList.this, getString(R.string.server_1571), Toast.LENGTH_SHORT).show();
                 }
             }
 
             @Override
-            public void onFailure(Call<Model_Get_dashboard_Cash> call, Throwable t)
+            public void onFailure(Call<Model_Get_Payment_Inventory> call, Throwable t)
             {
-//                Toast.makeText(context, ""+t.toString(), Toast.LENGTH_SHORT).show();
-                Toast.makeText(context , context.getString(R.string.server_1302) , Toast.LENGTH_LONG).show();
+                Toast.makeText(Pre_InvoiceDetailList.this, getString(R.string.server_1572), Toast.LENGTH_SHORT).show();
             }
         });
+        return amount;
     }
 
-    public void get_invoice()
+
+    public String edit_price(String price)
     {
-        Retrofit retrofit2 = new Retrofit.Builder().baseUrl(Config.getBaseUrl()).addConverterFactory(GsonConverterFactory.create()).build();
-        API myApi2 = retrofit2.create(API.class);
-        Model_Post_dashboard_invoice model_post = new Model_Post_dashboard_invoice();
-        model_post.setCustomer_id(Config.getuserid(context));
-        model_post.setToken(Config.getToken(context));
-        Call<Model_Get_dashboard_invoce> model = myApi2.get_dashboard_invoice(model_post);
-        model.enqueue(new Callback<Model_Get_dashboard_invoce>() {
-            @Override
-            public void onResponse(Call<Model_Get_dashboard_invoce> call, Response<Model_Get_dashboard_invoce> response)
-            {
-                if(response.isSuccessful())
-                {
-                    res4 = response.body().getResult();
+        int lengh = price.length();
+        StringBuilder price2 = new StringBuilder(price);
+        while (lengh>3)
+        {
+            lengh = lengh-3;
+            price2.insert(lengh , ",");
+        }
 
-                }
-                else
-                {
-                    Toast.makeText(context , context.getString(R.string.server_1311) , Toast.LENGTH_LONG).show();
-                }
-            }
-
-            @Override
-            public void onFailure(Call<Model_Get_dashboard_invoce> call, Throwable t)
-            {
-//                Toast.makeText(context, ""+t.toString(), Toast.LENGTH_SHORT).show();
-                Toast.makeText(context , context.getString(R.string.server_1312) , Toast.LENGTH_LONG).show();
-            }
-        });
+        return price2.toString();
     }
-
 }
