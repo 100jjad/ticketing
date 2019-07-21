@@ -1,26 +1,31 @@
 package com.example.ssoheyli.ticketing_newdesign;
 
+import android.content.Context;
 import android.graphics.Typeface;
-import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.v4.content.ContextCompat;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
-import android.view.MenuItem;
+import android.support.annotation.NonNull;
+import android.support.v4.app.Fragment;
+import android.support.v4.view.PagerAdapter;
+import android.support.v7.widget.StaggeredGridLayoutManager;
+import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
-import android.widget.Button;
+import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-
 import com.example.ssoheyli.ticketing_newdesign.Helpfull.API;
 import com.example.ssoheyli.ticketing_newdesign.Helpfull.Config;
-import com.example.ssoheyli.ticketing_newdesign.Model.Model_Get_AddtoBasekt;
-import com.example.ssoheyli.ticketing_newdesign.Model.Model_Post_AddtoBascket;
-import com.jaredrummler.materialspinner.MaterialSpinner;
+import com.example.ssoheyli.ticketing_newdesign.Model.Model_Get_dashboard_Cash;
+import com.example.ssoheyli.ticketing_newdesign.Model.Model_Get_dashboard_cmr;
+import com.example.ssoheyli.ticketing_newdesign.Model.Model_Get_dashboard_invoce;
+import com.example.ssoheyli.ticketing_newdesign.Model.Model_Get_dashboard_ticket;
+import com.example.ssoheyli.ticketing_newdesign.Model.Model_Post_dashboard_cmr;
+import com.example.ssoheyli.ticketing_newdesign.Model.Model_Post_dashboard_invoice;
+import com.example.ssoheyli.ticketing_newdesign.Model.Model_Post_dashboard_ticket;
+import com.example.ssoheyli.ticketing_newdesign.Model.dashbord_Model;
+
+import java.util.ArrayList;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -28,168 +33,215 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-
-;import static com.example.ssoheyli.ticketing_newdesign.ProductList.discount;
-import static com.example.ssoheyli.ticketing_newdesign.ProductList.name;
-import static com.example.ssoheyli.ticketing_newdesign.ProductList.price;
-
-/**
- * Created by s.soheyli on 11/3/2018.
- */
-
-public class Product_Detail extends AppCompatActivity
+public class viewpager_adapter_dashbord extends PagerAdapter
 {
-    TextView txvname , txvprice , txvdiscount , txvnumber , txv1 , txv2 , txv3 , txv4;
-    ImageView imv1;
-    Button btn_buy;
-    MaterialSpinner sprnumber;
-    Animation btnanim;
-    int number_Product=1;
-    @Override
-    protected void onCreate(@Nullable Bundle savedInstanceState)
+    int[] layout ;
+    int res1=0 , res2=0 , res3=0 , res4=0;
+    LayoutInflater layoutInflater;
+    Context context;
+    Fragment[] mFragment;
+    String TAG;
+
+    public viewpager_adapter_dashbord(int[] layout , Context context)
     {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.product_detail_material);
-        btnanim = AnimationUtils.loadAnimation(this, R.anim.button_anim1);
-        txvname = findViewById(R.id.tvname);
-        txvprice = findViewById(R.id.tvprice);
-        txvdiscount = findViewById(R.id.tvdiscount);
-        txvnumber = findViewById(R.id.tvnumber_product);
-        txv1 = findViewById(R.id.tv1);
-        txv2 = findViewById(R.id.tv2);
-        txv3 = findViewById(R.id.tv3);
-        txv4 = findViewById(R.id.tv4);
-        btn_buy = findViewById(R.id.bnchoos);
-        imv1 = findViewById(R.id.ivproduct);
-        sprnumber = findViewById(R.id.spnumber);
-        final String [] num = {"1" , "2" , "3" , "4" , "5" , "6" , "7" , "8" , "9" , "10"};
-        txvname.setText(name);
-        String current_price = edit_price(price);
-        String current_discount = edit_price(discount);
-        txvprice.setText(current_price);
-        txvdiscount.setText(current_discount);
-        txvnumber.setText(ProductList.number);
+        this.layout = layout;
+        this.context = context;
+        layoutInflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+    }
 
-        sprnumber.setItems("1" , "2" , "3" , "4" , "5" , "6" , "7" , "8" , "9" , "10");
-        imv1.setImageBitmap(ProductList.image);
+    @Override
+    public int getCount()
+    {
+        return layout.length;
+    }
 
-        sprnumber.setOnItemSelectedListener(new MaterialSpinner.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(MaterialSpinner view, int position, long id, Object item) {
-                number_Product = position;
-            }
-        });
+    @Override
+    public boolean isViewFromObject(@NonNull View view, @NonNull Object o)
+    {
+        return view==o;
+    }
 
-        Toolbar toolbar = findViewById(R.id.toolbar);
-
-        setSupportActionBar(toolbar);
-        if (getSupportActionBar()!=null){
-            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-            getSupportActionBar().setDisplayShowHomeEnabled(true);
-        }
-
-        toolbar.setTitleTextColor(ContextCompat.getColor(this , R.color.black));
-        //ActionBar actionBar = getSupportActionBar();
-        //actionBar.setDisplayHomeAsUpEnabled(true);
-        //actionBar.setHomeButtonEnabled(true);
-
-        toolbar.setTitle("  "+name);
-        toolbar.setTitleTextColor(getResources().getColor(R.color.black));
-
-
-        Typeface atf = Typeface.createFromAsset(getAssets(), "irsans.ttf");
-        txvname.setTypeface(atf);
-        txvprice.setTypeface(atf);
-        txvdiscount.setTypeface(atf);
-        txvnumber.setTypeface(atf);
-        txv1.setTypeface(atf);
-        txv2.setTypeface(atf);
-        txv3.setTypeface(atf);
-        txv4.setTypeface(atf);
-        btn_buy.setTypeface(atf);
-
-        btn_buy.setOnClickListener(new View.OnClickListener()
+    @NonNull
+    @Override
+    public Object instantiateItem(@NonNull final ViewGroup container, int position)
+    {
+        View view = layoutInflater.inflate(layout[position] , container , false);
+        container.addView(view);
+        if(position == 0)
         {
+            TextView textView = view.findViewById(R.id.tv_value1);
+            TextView textView2 = view.findViewById(R.id.tv_title1);
+            Typeface atf = Typeface.createFromAsset(context.getAssets(), "irsans.ttf");
+            textView.setTypeface(atf);
+            textView2.setTypeface(atf);
+            get_service();
+            textView.setText(""+res1);
+        }
+        else if(position == 1)
+        {
+            TextView textView = view.findViewById(R.id.tv_value2);
+            TextView textView2 = view.findViewById(R.id.tv_title2);
+            Typeface atf = Typeface.createFromAsset(context.getAssets(), "irsans.ttf");
+            textView.setTypeface(atf);
+            textView2.setTypeface(atf);
+            get_ticket();
+            textView.setText(""+res2);
+        }
+        else if(position == 2)
+        {
+            TextView textView = view.findViewById(R.id.tv_value3);
+            TextView textView2 = view.findViewById(R.id.tv_title3);
+            Typeface atf = Typeface.createFromAsset(context.getAssets(), "irsans.ttf");
+            textView.setTypeface(atf);
+            textView2.setTypeface(atf);
+            get_cash();
+            textView.setText(""+res3);
+        }
+        else if(position == 3)
+        {
+            TextView textView = view.findViewById(R.id.tv_value4);
+            TextView textView2 = view.findViewById(R.id.tv_title4);
+            Typeface atf = Typeface.createFromAsset(context.getAssets(), "irsans.ttf");
+            textView.setTypeface(atf);
+            textView2.setTypeface(atf);
+            get_invoice();
+            textView.setText(""+res4);
+        }
+        return view;
+    }
+
+    @Override
+    public void destroyItem(@NonNull ViewGroup container, int position, @NonNull Object object)
+    {
+        View view = (View) object;
+        container.removeView(view);
+    }
+
+
+
+    public void get_service()
+    {
+        Retrofit retrofit2 = new Retrofit.Builder().baseUrl(Config.getBaseUrl()).addConverterFactory(GsonConverterFactory.create()).build();
+        API myApi2 = retrofit2.create(API.class);
+        Model_Post_dashboard_cmr model_post = new Model_Post_dashboard_cmr();
+        model_post.setToken(Config.getToken(context));
+        Call<Model_Get_dashboard_cmr> model = myApi2.get_dashboard_cmr(model_post);
+        model.enqueue(new Callback<Model_Get_dashboard_cmr>() {
             @Override
-            public void onClick(View v)
+            public void onResponse(Call<Model_Get_dashboard_cmr> call, Response<Model_Get_dashboard_cmr> response) {
+                if(response.isSuccessful())
+                {
+                    res1 = response.body().getResult();
+                }
+                else
+                {
+                    Log.d(TAG , "Response" + response.toString());
+                    Toast.makeText(context , context.getString(R.string.server_1281) , Toast.LENGTH_LONG).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Model_Get_dashboard_cmr> call, Throwable t)
             {
-                btn_buy.startAnimation(btnanim);
-                Retrofit retrofit2 = new Retrofit.Builder().baseUrl(Config.getBaseUrl()).addConverterFactory(GsonConverterFactory.create()).build();
-                API myApi2 = retrofit2.create(API.class);
-                Model_Post_AddtoBascket model_post =new Model_Post_AddtoBascket();
-                model_post.setNumber(number_Product+1);
-                model_post.setProductid(ProductList.product_id);
-                model_post.setToken(Config.getToken(Product_Detail.this));
-                Call<Model_Get_AddtoBasekt> model = myApi2.Add_toBasket(model_post);
-                model.enqueue(new Callback<Model_Get_AddtoBasekt>() {
-                    @Override
-                    public void onResponse(Call<Model_Get_AddtoBasekt> call, Response<Model_Get_AddtoBasekt> response)
-                    {
-                        if(response.isSuccessful())
-                        {
-                            int res = response.body().getResult();
-                            if(res == -1)
-                            {
-                                Toast.makeText(Product_Detail.this, "تعداد محصول را به صورت صحیح وارد کنید", Toast.LENGTH_SHORT).show();
-                            }
-                            else if (res ==-2)
-                            {
-                                Toast.makeText(Product_Detail.this, "قیمت محصول نامعتبر است", Toast.LENGTH_SHORT).show();
-
-                            }
-
-                            else if (res ==-3)
-                            {
-                                Toast.makeText(Product_Detail.this, "خطا از سمت سرور", Toast.LENGTH_SHORT).show();
-
-                            }
-                            else if(res> 0 || res == 0)
-                            {
-                                Toast.makeText(Product_Detail.this, "کالا به سبد خرید افزوده شد", Toast.LENGTH_SHORT).show();
-                            }
-                            else if(res == -44)
-                            {
-                                Toast.makeText(Product_Detail.this, "توکن نامعتبر است", Toast.LENGTH_SHORT).show();
-                            }
-                        }
-                        else
-                        {
-                            Toast.makeText(Product_Detail.this, "خطا از سمت سرور", Toast.LENGTH_SHORT).show();
-                        }
-                    }
-
-                    @Override
-                    public void onFailure(Call<Model_Get_AddtoBasekt> call, Throwable t)
-                    {
-                        Toast.makeText(Product_Detail.this, "خطا از سمت سرور", Toast.LENGTH_SHORT).show();
-                    }
-                });
-
+//                Toast.makeText(context, ""+t.toString(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(context , context.getString(R.string.server_1282) , Toast.LENGTH_LONG).show();
             }
         });
 
     }
 
-    public String edit_price(String price)
+    public void get_ticket()
     {
-        int lengh = price.length();
-        StringBuilder price2 = new StringBuilder(price);
-        while (lengh>3)
-        {
-            lengh = lengh-3;
-            price2.insert(lengh , ",");
-        }
 
-        return price2.toString();
+        Retrofit retrofit2 = new Retrofit.Builder().baseUrl(Config.getBaseUrl()).addConverterFactory(GsonConverterFactory.create()).build();
+        API myApi2 = retrofit2.create(API.class);
+        Model_Post_dashboard_ticket model_post = new Model_Post_dashboard_ticket();
+        model_post.setCustomerId(Config.getuserid(context));
+        Call<Model_Get_dashboard_ticket> model = myApi2.get_dashboard_ticket(model_post);
+        model.enqueue(new Callback<Model_Get_dashboard_ticket>() {
+            @Override
+            public void onResponse(Call<Model_Get_dashboard_ticket> call, Response<Model_Get_dashboard_ticket> response)
+            {
+                if(response.isSuccessful())
+                {
+                    res2 = response.body().getResult();
+                }
+                else
+                {
+                    Log.d(TAG , "Response" + response.toString());
+                    Toast.makeText(context , context.getString(R.string.server_1291) , Toast.LENGTH_LONG).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Model_Get_dashboard_ticket> call, Throwable t)
+            {
+//                Toast.makeText(context, ""+t.toString(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(context , context.getString(R.string.server_1292) , Toast.LENGTH_LONG).show();
+            }
+        });
     }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // handle arrow click here
-        if (item.getItemId() == android.R.id.home) {
-            finish(); // close this activity and return to preview activity (if there is any)
-        }
+    public void get_cash()
+    {
+        Retrofit retrofit2 = new Retrofit.Builder().baseUrl(Config.getBaseUrl()).addConverterFactory(GsonConverterFactory.create()).build();
+        API myApi2 = retrofit2.create(API.class);
+        Model_Post_dashboard_cmr model_post = new Model_Post_dashboard_cmr();
+        model_post.setToken(Config.getToken(context));
+        Call<Model_Get_dashboard_Cash> model = myApi2.get_dashboard_cash(model_post);
+        model.enqueue(new Callback<Model_Get_dashboard_Cash>() {
+            @Override
+            public void onResponse(Call<Model_Get_dashboard_Cash> call, Response<Model_Get_dashboard_Cash> response)
+            {
+                if(response.isSuccessful())
+                {
+                    res3 = response.body().getResultDouble();
+                }
+                else
+                {
+                    Toast.makeText(context , context.getString(R.string.server_1301) , Toast.LENGTH_LONG).show();
+                }
+            }
 
-        return super.onOptionsItemSelected(item);
+            @Override
+            public void onFailure(Call<Model_Get_dashboard_Cash> call, Throwable t)
+            {
+//                Toast.makeText(context, ""+t.toString(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(context , context.getString(R.string.server_1302) , Toast.LENGTH_LONG).show();
+            }
+        });
     }
+
+    public void get_invoice()
+    {
+        Retrofit retrofit2 = new Retrofit.Builder().baseUrl(Config.getBaseUrl()).addConverterFactory(GsonConverterFactory.create()).build();
+        API myApi2 = retrofit2.create(API.class);
+        Model_Post_dashboard_invoice model_post = new Model_Post_dashboard_invoice();
+        model_post.setCustomer_id(Config.getuserid(context));
+        model_post.setToken(Config.getToken(context));
+        Call<Model_Get_dashboard_invoce> model = myApi2.get_dashboard_invoice(model_post);
+        model.enqueue(new Callback<Model_Get_dashboard_invoce>() {
+            @Override
+            public void onResponse(Call<Model_Get_dashboard_invoce> call, Response<Model_Get_dashboard_invoce> response)
+            {
+                if(response.isSuccessful())
+                {
+                    res4 = response.body().getResult();
+
+                }
+                else
+                {
+                    Toast.makeText(context , context.getString(R.string.server_1311) , Toast.LENGTH_LONG).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Model_Get_dashboard_invoce> call, Throwable t)
+            {
+//                Toast.makeText(context, ""+t.toString(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(context , context.getString(R.string.server_1312) , Toast.LENGTH_LONG).show();
+            }
+        });
+    }
+
 }
