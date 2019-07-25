@@ -1,206 +1,25 @@
-<?xml version="1.0" encoding="utf-8"?>
-<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:layoutDirection="rtl"
-    tools:context=".view.activity.ProfileActivity">
+    @TargetApi(Build.VERSION_CODES.N)
+    private static Context updateResources(Context context, String language) {
+        Locale locale = new Locale(language);
+        Locale.setDefault(locale);
 
-    <android.support.design.widget.AppBarLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:theme="@style/ThemeOverlay.AppCompat.Dark">
+        Configuration configuration = context.getResources().getConfiguration();
+        configuration.setLocale(locale);
 
-        <android.support.design.widget.CollapsingToolbarLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:contentScrim="@color/colorPrimary"
-            app:layout_scrollFlags="scroll|exitUntilCollapsed"
-            app:titleEnabled="false">
+        return context.createConfigurationContext(configuration);
+    }
 
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:layout_collapseMode="parallax">
+    @SuppressWarnings("deprecation")
+    private static Context updateResourcesLegacy(Context context, String language) {
+        Locale locale = new Locale(language);
+        Locale.setDefault(locale);
 
-                <ImageView
-                    android:id="@+id/form_background"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:adjustViewBounds="true"
-                    android:scaleType="fitXY"
-                    android:src="@drawable/form_background" />
+        Resources resources = context.getResources();
 
-                <com.example.androidd.a7learn.view.custom.CustomFontButton
-                    android:id="@+id/edit_avatar"
-                    android:layout_width="wrap_content"
-                    android:layout_height="35dp"
-                    android:layout_alignRight="@id/form_background"
-                    android:layout_alignBottom="@id/form_background"
-                    android:layout_marginTop="@dimen/standard_margin"
-                    android:layout_marginRight="@dimen/standard_margin"
-                    android:layout_marginBottom="@dimen/standard_margin"
-                    android:background="@drawable/selector_orange_button"
-                    android:foreground="?attr/selectableItemBackground"
-                    android:text="تغییر عکس"
-                    android:textColor="@android:color/black"
-                    android:textSize="@dimen/normal_font_size_dp" />
+        Configuration configuration = resources.getConfiguration();
+        configuration.locale = locale;
 
-                <ImageView
-                    android:layout_width="0dp"
-                    android:layout_height="62dp"
-                    android:layout_above="@id/edit_avatar"
-                    android:layout_alignLeft="@id/edit_avatar"
-                    android:layout_alignRight="@id/edit_avatar"
-                    android:src="@drawable/default_avatar" />
+        resources.updateConfiguration(configuration, resources.getDisplayMetrics());
 
-            </RelativeLayout>
-
-            <android.support.v7.widget.Toolbar
-                android:id="@+id/toolbar"
-                android:layout_width="match_parent"
-                android:layout_height="?attr/actionBarSize"
-                app:layout_collapseMode="pin" />
-
-        </android.support.design.widget.CollapsingToolbarLayout>
-
-    </android.support.design.widget.AppBarLayout>
-
-    <android.support.v4.widget.NestedScrollView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_below="@id/form_background"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior">
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:padding="@dimen/standard_margin2x">
-
-            <com.example.androidd.a7learn.view.custom.CustomFontTextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="right"
-                android:layout_marginBottom="@dimen/standard_margin"
-                android:text="اطلاعات فردی"
-                android:textColor="@android:color/black"
-                android:textSize="@dimen/normal_font_size" />
-
-            <EditText
-                android:id="@+id/editText_firstName"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="@dimen/form_fields_margin"
-                android:layout_marginRight="@dimen/form_fields_margin"
-                android:layout_marginBottom="@dimen/standard_margin"
-                android:background="@drawable/selector_default_edit_text"
-                android:hint="نام"
-                android:maxLength="20"
-                android:maxLines="1"
-                android:padding="@dimen/standard_margin"
-                android:textSize="@dimen/normal_font_size" />
-
-
-            <EditText
-                android:id="@+id/editText_lastName"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="@dimen/form_fields_margin"
-                android:layout_marginRight="@dimen/form_fields_margin"
-                android:layout_marginBottom="@dimen/standard_margin"
-                android:background="@drawable/selector_default_edit_text"
-                android:hint="نام خانوادگی"
-                android:maxLength="40"
-                android:maxLines="1"
-                android:padding="@dimen/standard_margin"
-                android:textSize="@dimen/normal_font_size" />
-
-            <com.example.androidd.a7learn.view.custom.CustomFontTextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="right"
-                android:layout_marginBottom="@dimen/standard_margin"
-                android:text="تخصص ها"
-                android:textColor="@android:color/black"
-                android:textSize="@dimen/normal_font_size" />
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="@dimen/standard_margin"
-                android:gravity="center_horizontal"
-                android:orientation="horizontal">
-
-                <CheckBox
-                    android:id="@+id/java_cb"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginRight="@dimen/standard_margin"
-                    android:text="Java" />
-
-                <CheckBox
-                    android:id="@+id/css_cb"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginRight="@dimen/standard_margin"
-                    android:text="CSS" />
-
-                <CheckBox
-                    android:id="@+id/html_cb"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginRight="@dimen/standard_margin"
-                    android:text="HTML" />
-
-            </LinearLayout>
-
-            <com.example.androidd.a7learn.view.custom.CustomFontTextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="right"
-                android:layout_marginBottom="@dimen/standard_margin"
-                android:text="جنسیت"
-                android:textColor="@android:color/black"
-                android:textSize="@dimen/normal_font_size" />
-
-            <RadioGroup
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="@dimen/standard_margin"
-                android:gravity="center_horizontal"
-                android:orientation="horizontal">
-
-                <RadioButton
-                    android:id="@+id/female"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginRight="@dimen/standard_margin"
-                    android:text="زن" />
-
-                <RadioButton
-                    android:id="@+id/male"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="مرد" />
-
-            </RadioGroup>
-
-            <com.example.androidd.a7learn.view.custom.CustomFontButton
-                android:id="@+id/save_from"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="@dimen/form_fields_margin"
-                android:layout_marginTop="@dimen/standard_margin"
-                android:layout_marginRight="@dimen/form_fields_margin"
-                android:background="@drawable/selector_blue_button"
-                android:foreground="?attr/selectableItemBackground"
-                android:text="ثبت اطلاعات"
-                android:textColor="@android:color/white" />
-
-        </LinearLayout>
-
-    </android.support.v4.widget.NestedScrollView>
-
-</android.support.design.widget.CoordinatorLayout>
+        return context;
+    }
