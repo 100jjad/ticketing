@@ -1,0 +1,655 @@
+package com.example.ssoheyli.ticketing_newdesign.Ticket;
+
+import android.annotation.SuppressLint;
+import android.app.ProgressDialog;
+import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.graphics.Typeface;
+import android.graphics.drawable.Drawable;
+import android.media.MediaPlayer;
+import android.os.AsyncTask;
+import android.os.Environment;
+import android.os.Handler;
+import android.os.Looper;
+import android.os.Message;
+import android.os.PowerManager;
+import android.support.constraint.ConstraintLayout;
+import android.support.v7.widget.RecyclerView;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.SeekBar;
+import android.widget.TextView;
+import android.widget.Toast;
+
+
+import com.example.ssoheyli.ticketing_newdesign.Helpfull.API;
+import com.example.ssoheyli.ticketing_newdesign.Helpfull.Config;
+import com.example.ssoheyli.ticketing_newdesign.Model.Detail_TicketlisModel;
+import com.example.ssoheyli.ticketing_newdesign.Model.Model_getTypeFile;
+import com.example.ssoheyli.ticketing_newdesign.R;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.concurrent.TimeUnit;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
+
+/**
+ * Created by s.soheyli on 10/29/2018.
+ */
+
+public class Ticket_Detaillist_Adapter extends RecyclerView.Adapter<Ticket_Detaillist_Adapter.viewhollder>
+{
+
+    List<Detail_TicketlisModel> entries = new ArrayList<>();
+    ArrayList<Detail_TicketlisModel> filtred;
+    private Context context;
+    String imagePath;
+    boolean flag_voice = false;
+
+    TextView txv1;
+    String name = "download.jpeg";
+    int f = 0;
+    String type="";
+    private static MediaPlayer player;
+    String Address = "";
+    private static final int VIEW_TYPE_MESSAGE_SENT = 1;
+    private static final int VIEW_TYPE_MESSAGE_RECEIVED = 2;
+
+    public Ticket_Detaillist_Adapter(Context context)
+    {
+        this.context = context;
+        filtred = new ArrayList<>(entries);
+    }
+    @Override
+    public int getItemViewType(int position)
+    {
+        if(!entries.get(position).getS3())
+        {
+            return VIEW_TYPE_MESSAGE_RECEIVED;
+        }
+        else if(entries.get(position).getS3())
+        {
+            return VIEW_TYPE_MESSAGE_SENT;
+        }
+
+        return super.getItemViewType(position);
+    }
+
+    @Override
+    public Ticket_Detaillist_Adapter.viewhollder onCreateViewHolder(ViewGroup parent, int viewType)
+    {
+        if(viewType == VIEW_TYPE_MESSAGE_RECEIVED)
+        {
+
+            LayoutInflater layoutInflater =LayoutInflater.from(context);
+            View v = layoutInflater.inflate(R.layout.item_send_chat , parent , false);
+            return new Ticket_Detaillist_Adapter.viewhollder(v);
+        }
+        else
+        {
+            LayoutInflater layoutInflater =LayoutInflater.from(context);
+            View v = layoutInflater.inflate(R.layout.item_recive_chat1 , parent , false);
+            return new Ticket_Detaillist_Adapter.viewhollder(v);
+        }
+
+    }
+
+    @Override
+    public void onBindViewHolder(final viewhollder holder, int position) {
+        holder.bindadress(entries.get(position));
+        holder.btnPlay.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (holder.filetype.equals(".ogg") || holder.filetype.equals(".3gpp") && !flag_voice)
+                {
+
+                    player = new MediaPlayer();
+                    player.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+                        @Override
+                        public void onPrepared(MediaPlayer mp) {
+                            holder.seekBar.setMax(player.getDuration());
+                            //timer
+                            holder.voice_timer.setText(getHumanTimeText((long)player.getDuration()));
+
+                            final Timer timer;
+                            if (player != null) {
+                                player.start();
+                                timer = new Timer();
+                                timer.scheduleAtFixedRate(new TimerTask() {
+                                    @Override
+                                    public void run() {
+                                        ((Detail_Ticket_List)context).runOnUiThread(new Runnable() {
+                                            @Override
+                                            public void run() {
+                                                if (player != null && player.isPlaying()) {
+                                                    holder.voice_timer.post(new Runnable() {
+                                                        @Override
+                                                        public void run() {
+                                                            holder.voice_timer.setText(getHumanTimeText((long)player.getCurrentPosition()));
+                                                        }
+                                                    });
+                                                } else {
+                                                    timer.cancel();
+                                                    timer.purge();
+                                                }
+                                            }
+                                        });
+                                    }
+                                }, 0, 10);
+                            }
+
+                            new Thread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    while(player!=null && player.getCurrentPosition()<player.getDuration())
+                                    {
+                                        holder.seekBar.setProgress(player.getCurrentPosition());
+
+                                        Message msg=new Message();
+
+                                        int millis = player.getCurrentPosition();
+
+                                        msg.obj=millis/1000;
+
+                                        try {
+                                            Thread.sleep(100);
+                                        }
+                                        catch (InterruptedException e) {
+                                            e.printStackTrace();
+                                        }
+                                    }
+                                }
+                            }).start();
+                        }
+                    });
+
+                    flag_voice = true;
+                    holder.btnPlay.setImageResource(R.drawable.pause_icon);
+
+                    holder.seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+                        @Override
+                        public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                            if (fromUser) {
+                                player.seekTo(progress);
+                            }
+                        }
+
+                        @Override
+                        public void onStartTrackingTouch(SeekBar seekBar) {
+
+                        }
+
+                        @Override
+                        public void onStopTrackingTouch(SeekBar seekBar) {
+
+                        }
+                    });
+
+                    try {
+                        player.setDataSource(Environment.getExternalStorageDirectory().toString() + "/Ticketing/Voice/" + holder.bindname);
+                        player.prepare();
+                        player.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+                            @Override
+                            public void onCompletion(MediaPlayer mp) {
+
+                                holder.btnPlay.setImageResource(R.drawable.play_icon);
+                                holder.seekBar.setProgress(0);
+                                flag_voice = false;
+                            }
+                        });
+
+                    } catch (IllegalArgumentException e) {
+                        e.printStackTrace();
+                    } catch (Exception e) {
+                        System.out.println("Exception of type : " + e.toString());
+                        e.printStackTrace();
+                    }
+
+                    player.start();
+                }
+
+            }
+        });
+    }
+
+
+    @Override
+    public int getItemCount() {
+        return entries.size();
+    }
+
+    public class viewhollder extends RecyclerView.ViewHolder
+    {
+        TextView  txv2 , txv3 , txv4 , txv5;
+        TextView voice_timer;
+        ImageView imvattachfile;
+        LinearLayout ll;
+        ConstraintLayout constraintLayout;
+        ImageView btnPlay;
+        SeekBar seekBar;
+
+        String filetype;
+        String bindname;
+
+        public viewhollder(View itemView) {
+            super(itemView);
+            txv1 = itemView.findViewById(R.id.subject);
+            txv2 = itemView.findViewById(R.id.date);
+            imvattachfile = itemView.findViewById(R.id.ivattachfile);
+            constraintLayout = itemView.findViewById(R.id.voice_container);
+            btnPlay = itemView.findViewById(R.id.btn_play);
+            seekBar = itemView.findViewById(R.id.voice_progress);
+            voice_timer = itemView.findViewById(R.id.voice_timer);
+        }
+
+        public void bindadress(final Detail_TicketlisModel model)
+        {
+            String subject = model.getS1();
+            String date = model.getS2();
+            String newdate = "";
+            String time = "";
+            filetype = model.getType();
+            final int detailid = model.getS5();
+            bindname = model.getS5()+model.getType();
+            player = new MediaPlayer();
+
+            if(filetype.equals(".jpeg") || filetype.equals(".png"))
+                {
+                    constraintLayout.setVisibility(View.GONE);
+                    File f = new File(Environment.getExternalStorageDirectory().toString()+"/Ticketing/Picture/"+bindname);
+                    if(!f.exists())
+                    {
+                        get_file(detailid);
+                    }
+//                    ConstraintLayout.LayoutParams params = new ConstraintLayout.LayoutParams(ConstraintLayout.LayoutParams.WRAP_CONTENT , ConstraintLayout.LayoutParams.WRAP_CONTENT);
+//                    imvattachfile.setLayoutParams(params);
+                    imvattachfile.setImageDrawable(Drawable.createFromPath(Environment.getExternalStorageDirectory().toString() + "/Ticketing/Picture/" + bindname));
+                    imvattachfile.getLayoutParams().height = 550;
+                    imvattachfile.getLayoutParams().width = 550;
+
+                }
+                else if(filetype.equals(".ogg") || filetype.equals(".3gpp"))
+                {
+                    constraintLayout.setVisibility(View.VISIBLE);
+                    File f = new File(Environment.getExternalStorageDirectory().toString()+"/Ticketing/Voice/"+bindname);
+                    if(!f.exists())
+                    {
+                        get_file(detailid);
+                    }
+
+                    player = new MediaPlayer();
+                    try {
+                        player.setDataSource(Environment.getExternalStorageDirectory().toString() + "/Ticketing/Voice/" + bindname);
+                        player.prepare();
+                        voice_timer.setText(getHumanTimeText((long)player.getDuration()));
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+
+//                    ConstraintLayout.LayoutParams params = new ConstraintLayout.LayoutParams(ConstraintLayout.LayoutParams.WRAP_CONTENT , ConstraintLayout.LayoutParams.WRAP_CONTENT);
+//                    params.setMargins(0 , 0 , 800 , 0);
+//                    imvattachfile.setLayoutParams(params);
+
+                    //imvattachfile.setImageResource(R.drawable.play_icon);
+                    //imvattachfile.getLayoutParams().height = 100;
+                    //imvattachfile.getLayoutParams().width = 100;
+
+                }
+                else if(filetype.equals("nofile"))
+                {
+                    constraintLayout.setVisibility(View.GONE);
+                    ConstraintLayout.LayoutParams params = new ConstraintLayout.LayoutParams(ConstraintLayout.LayoutParams.WRAP_CONTENT , ConstraintLayout.LayoutParams.WRAP_CONTENT);
+                    imvattachfile.setLayoutParams(params);
+                    imvattachfile.setImageResource(R.drawable.not);
+                }
+                else if(model.getType().equals(".pdf") || model.getType().equals(".doc") || model.getType().equals(".docx"))
+                {
+                    constraintLayout.setVisibility(View.GONE);
+                    File f = new File(Environment.getExternalStorageDirectory().toString()+"/Ticketing/Document/"+bindname);
+                    if(!f.exists())
+                    {
+                        get_file(detailid);
+                    }
+
+//                    ConstraintLayout.LayoutParams params = new ConstraintLayout.LayoutParams(ConstraintLayout.LayoutParams.WRAP_CONTENT , ConstraintLayout.LayoutParams.WRAP_CONTENT);
+//                    imvattachfile.setLayoutParams(params);
+                    imvattachfile.setImageResource(R.drawable.file_icon);
+                    imvattachfile.getLayoutParams().height = 550;
+                    imvattachfile.getLayoutParams().width = 550;
+                }
+
+            if (imvattachfile != null) {
+
+                imvattachfile.setOnClickListener(new View.OnClickListener()
+                {
+                    @Override
+                    public void onClick(View v) {
+                        if (filetype.equals(".jpeg") || filetype.equals(".png"))
+                        {
+//                            ConstraintLayout.LayoutParams params = new ConstraintLayout.LayoutParams(250,250);
+//                            imvattachfile.setLayoutParams(params);
+                            imvattachfile.setImageDrawable(Drawable.createFromPath(Environment.getExternalStorageDirectory().toString() + "/Ticketing/Picture/" + bindname));
+                            imvattachfile.getLayoutParams().height = 550;
+                            imvattachfile.getLayoutParams().width = 550;
+
+                            Intent intent = new Intent(context,ImageDetailActivity.class);
+                            intent.putExtra("path",Environment.getExternalStorageDirectory().toString() + "/Ticketing/Picture/" + bindname);
+                            context.startActivity(intent);
+                        }
+                        else if (filetype.equals(".ogg") || filetype.equals(".3gpp"))
+                        {
+                            imvattachfile.getLayoutParams().height = 250;
+                            imvattachfile.getLayoutParams().width = 250;
+                            try {
+
+                                player.setDataSource(Environment.getExternalStorageDirectory().toString() + "/Ticketing/Voice/" + bindname);
+                                player.prepare();
+
+                            } catch (IllegalArgumentException e) {
+                                e.printStackTrace();
+                            } catch (Exception e) {
+                                System.out.println("Exception of type : " + e.toString());
+                                e.printStackTrace();
+                            }
+
+                        }
+
+                    }
+                });
+            }
+
+                btnPlay.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+
+                        if (filetype.equals(".jpeg") || filetype.equals(".png"))
+                        {
+//                            ConstraintLayout.LayoutParams params = new ConstraintLayout.LayoutParams(250,250);
+//                            imvattachfile.setLayoutParams(params);
+                            imvattachfile.setImageDrawable(Drawable.createFromPath(Environment.getExternalStorageDirectory().toString() + "/Ticketing/Picture/" + bindname));
+                            imvattachfile.getLayoutParams().height = 550;
+                            imvattachfile.getLayoutParams().width = 550;
+                        }
+                        else if (filetype.equals(".ogg") || filetype.equals(".3gpp") && !flag_voice)
+                        {
+                            player = new MediaPlayer();
+                            player.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+                                @Override
+                                public void onPrepared(MediaPlayer mp) {
+                                    seekBar.setMax(player.getDuration());
+                                    //timer
+                                    voice_timer.setText(getHumanTimeText((long)player.getDuration()));
+
+                                    final Timer timer;
+                                    if (player != null) {
+                                        player.start();
+                                        timer = new Timer();
+                                        timer.scheduleAtFixedRate(new TimerTask() {
+                                            @Override
+                                            public void run() {
+                                                ((Detail_Ticket_List)context).runOnUiThread(new Runnable() {
+                                                    @Override
+                                                    public void run() {
+                                                        if (player != null && player.isPlaying()) {
+                                                            voice_timer.post(new Runnable() {
+                                                                @Override
+                                                                public void run() {
+                                                                    voice_timer.setText(getHumanTimeText((long)player.getCurrentPosition()));
+                                                                }
+                                                            });
+                                                        } else {
+                                                            timer.cancel();
+                                                            timer.purge();
+                                                        }
+                                                    }
+                                                });
+                                            }
+                                        }, 0, 10);
+                                    }
+
+                                    new Thread(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            while(player!=null && player.getCurrentPosition()<player.getDuration())
+                                            {
+                                                seekBar.setProgress(player.getCurrentPosition());
+
+                                                Message msg=new Message();
+
+                                                int millis = player.getCurrentPosition();
+
+                                                msg.obj=millis/1000;
+
+                                                try {
+                                                    Thread.sleep(100);
+                                                }
+                                                catch (InterruptedException e) {
+                                                    e.printStackTrace();
+                                                }
+                                            }
+                                        }
+                                    }).start();
+                                }
+                            });
+
+                            flag_voice = true;
+                            btnPlay.setImageResource(R.drawable.pause_icon);
+
+                            //imvattachfile.getLayoutParams().height = 250;
+                            //imvattachfile.getLayoutParams().width = 250;
+                            try {
+                                player.setDataSource(Environment.getExternalStorageDirectory().toString() + "/Ticketing/Voice/" + bindname);
+                                player.prepare();
+                                player.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+                                    @Override
+                                    public void onCompletion(MediaPlayer mp) {
+
+                                        btnPlay.setImageResource(R.drawable.play_icon);
+                                        flag_voice = false;
+                                    }
+                                });
+
+                            } catch (IllegalArgumentException e) {
+                                e.printStackTrace();
+                            } catch (Exception e) {
+                                System.out.println("Exception of type : " + e.toString());
+                                e.printStackTrace();
+                            }
+
+                            player.start();
+                        }
+                        else if (filetype.equals(".ogg") || filetype.equals(".3gpp") && flag_voice)
+                        {
+                            btnPlay.setImageResource(R.drawable.play_icon);
+                            player.pause();
+                            flag_voice = false;
+                        }
+
+                    }
+                });
+
+
+            newdate = date.substring(0 , 8);
+            time = date.substring(21 , 30);
+
+//            txv1.setText(newdate.concat(" "+time));
+            txv1.setText(date);
+            txv2.setText(subject);
+
+            Typeface atf = Typeface.createFromAsset(context.getAssets(), "roboto-regular.ttf");
+            txv1.setTypeface(atf);
+            txv2.setTypeface(atf);
+
+            boolean id = model.getS3();
+        }
+    }
+
+
+    public String get_file(final int id)
+    {
+        //تابع  دریافت فایل ها
+
+        Retrofit retrofit2 = new Retrofit.Builder().baseUrl(Config.getBaseUrl()).addConverterFactory(GsonConverterFactory.create()).build();
+        API myApi2 = retrofit2.create(API.class);
+        Call<Model_getTypeFile> model = myApi2.Get_file(""+id , Config.getToken(context));
+        model.enqueue(new Callback<Model_getTypeFile>()
+        {
+            @Override
+            public void onResponse(Call<Model_getTypeFile> call, Response<Model_getTypeFile> response)
+            {
+                if(response.isSuccessful())
+                {
+                    type= response.body().getType();
+                    name = ""+id+""+type;
+                    if(type.equals(".jpeg") || type.equals(".png")|| type.equals(".jpg"))
+                    {
+                        Address = Config.get_Picture_Address(context);
+                    }
+                    else if(type.equals(".ogg") || type.equals(".3gpp"))
+                    {
+                        Address = Config.get_Voice_Address(context);
+                    }
+                    else
+                    {
+                        Address = Config.get_Document_Address(context);
+                    }
+                    ProgressDialog mProgressDialog;
+                    mProgressDialog = new ProgressDialog(context);
+                    mProgressDialog.setMessage("Loading");
+                    mProgressDialog.setIndeterminate(true);
+                    mProgressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+                    mProgressDialog.setCancelable(true);
+                    final DownloadTask downloadTask = new DownloadTask(context);
+                    downloadTask.execute(Config.getBaseUrl()+"Ticket/Download/"+id+"?token="+Config.getToken(context)+"");
+                    mProgressDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
+                        @Override
+                        public void onCancel(DialogInterface dialog) {
+                            downloadTask.cancel(true);
+                        }
+                    });
+
+                }
+                else
+                {
+                    Toast.makeText(context, context.getString(R.string.ticketlist_fileerror), Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Model_getTypeFile> call, Throwable t)
+            {
+                Toast.makeText(context, context.getString(R.string.ticketlist_fireerror_request)+t, Toast.LENGTH_SHORT).show();
+            }
+        });
+        return type;
+    }
+
+    private class DownloadTask extends AsyncTask<String, Integer, String> {
+
+        private Context context;
+        private PowerManager.WakeLock mWakeLock;
+
+        public DownloadTask(Context context) {
+            this.context = context;
+        }
+
+
+        @Override
+        protected String doInBackground(String... sUrl)
+        {
+            InputStream input = null;
+            OutputStream output = null;
+            File file = null;
+            File root = Environment.getExternalStorageDirectory();
+            HttpURLConnection connection = null;
+            try {
+                URL url = new URL(sUrl[0]);
+                connection = (HttpURLConnection) url.openConnection();
+                connection.connect();
+
+                // HTTP 200 OK
+                if (connection.getResponseCode() != HttpURLConnection.HTTP_OK) {
+                    return "Server returned HTTP " + connection.getResponseCode()
+                            + " " + connection.getResponseMessage();
+                }
+
+                int fileLength = connection.getContentLength();
+
+
+                input = connection.getInputStream();
+                output = new FileOutputStream(Address + "/"+name);
+                imagePath = Address +"/"+ name;
+
+
+                byte data[] = new byte[4096];
+                long total = 0;
+                int count;
+                while ((count = input.read(data)) != -1) {
+                    if (isCancelled()) {
+                        input.close();
+                        return null;
+                    }
+                    total += count;
+
+                    if (fileLength > 0)
+                        publishProgress((int) (total * 100 / fileLength));
+                    output.write(data, 0, count);
+                }
+            } catch (Exception e) {
+                return e.toString();
+            } finally {
+                try {
+                    if (output != null)
+                        output.close();
+                    if (input != null)
+                        input.close();
+                } catch (IOException ignored) {
+                }
+
+                if (connection != null)
+                    connection.disconnect();
+            }
+            return null;
+        }
+    }
+
+    public void play(String outputFile) {
+        try{
+            MediaPlayer myPlayer = new MediaPlayer();
+            myPlayer.setDataSource(outputFile);
+            myPlayer.prepare();
+            myPlayer.start();
+
+        } catch (Exception e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+    }
+
+    @SuppressLint("DefaultLocale")
+    private String getHumanTimeText(long milliseconds) {
+        return String.format("%02d:%02d",
+                TimeUnit.MILLISECONDS.toMinutes(milliseconds),
+                TimeUnit.MILLISECONDS.toSeconds(milliseconds) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(milliseconds))
+        );
+    }
+
+}
