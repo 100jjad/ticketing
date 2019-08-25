@@ -1,3 +1,27 @@
+
+    <string name="sort_default">پیشفرض</string>
+    <string name="sort_name">نام(الف - ی)</string>
+    <string name="sort_name_desc">نام(ی - الف)</string>
+    <string name="sort_price">قیمت(کم به زیاد)</string>
+    <string name="price_sort_desc">قیمت(زیاد به کم)</string>
+    <string name="sort_title">مرتب سازی:</string>
+    <string name="show_title">نمایش:</string>
+
+
+
+
+    <string name="sort_default">Default</string>
+    <string name="sort_name">Name(A-Z)</string>
+    <string name="sort_name_desc">Name(Z-A)</string>
+    <string name="sort_price">Price(Low-High)</string>
+    <string name="price_sort_desc">Price(High-Low)</string>
+    <string name="sort_title">Sort:</string>
+    <string name="show_title">Show:</string>
+
+
+
+
+
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
