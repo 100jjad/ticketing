@@ -4,3 +4,6 @@
         InputMethodManager imm = (InputMethodManager) context.getSystemService(Activity.INPUT_METHOD_SERVICE);
         imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
     }
+
+    @POST("product/ProductPropertyAndValueForApp")
+    Call<List<Model_Get_Filter_Item>> get_filter_item_list(@Body Model_Post_Filter_Item model_post_filter_item);
