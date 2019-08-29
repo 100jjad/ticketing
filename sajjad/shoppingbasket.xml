@@ -122,3 +122,6 @@
 
     <string name="final_basket"><![CDATA[خرید خود را نهایی کنید >]]></string>
     <string name="confirm_basket">تایید خرید موفقیت آمیز نبود</string>
+
+    <string name="final_basket">Complete your purchase ></string>
+    <string name="confirm_basket">Confirm purchase failed !</string>
