@@ -373,3 +373,6 @@ public class ShoppingBasket extends Activity implements SwipeRefreshLayout.OnRef
         getTotalAmount();
     }
 }
+
+    @POST("Invoice/ChangeBasketToPreFaktorForApp")
+    Call<Model_Get_Basket_Confirm> confirmBasket(@Body Model_Post_Basket_Confirm model_post_basket_confirm);
