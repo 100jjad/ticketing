@@ -3,6 +3,8 @@ package com.example.ssoheyli.ticketing_newdesign.Helpfull;
 import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 
 import com.example.ssoheyli.ticketing_newdesign.Language.LanguageModel;
 import com.example.ssoheyli.ticketing_newdesign.R;
@@ -18,10 +20,13 @@ public class Config extends Activity {
 
     //public static String BaseUrl = "http://dianasolution.com/";
     public static String BaseUrl = "https://portal.zibahome.com/";
-
-    public static String BaseUrl_Alt = "https://tavanasazan.com/";
+    //public static String BaseUrl = "https://tavanasazan.com/";
 
     public static String LANG_KEY = "langId";
+
+    public static String APP_VERSION = "1.0.0.0 Alpha";
+
+    public static String DOWNLOAD_LINK = BaseUrl + "FileManager/App/TSAPP.apk";
 
     // LANGUAGE
     public static List<LanguageModel> languageModels = new ArrayList<>();
@@ -35,49 +40,85 @@ public class Config extends Activity {
     }
 
     public static int getLCID(Context context) {
-
         int LCID = 1065;
 
         if (Config.get_Language(context).equals("english")) {
-            for (int i = 0; i < languageModels.size(); i++) {
-                if (languageModels.get(i).getCulture().equals("en")) {
-                    LCID = languageModels.get(i).getLCID();
+            if (languageModels.size() != 0) {
+                for (int i = 0; i < languageModels.size(); i++) {
+                    if (languageModels.get(i).getCulture().equals("en")) {
+                        LCID = languageModels.get(i).getLCID();
+                    }
                 }
+            } else {
+                LCID = 1033;
             }
-            return LCID;
         } else if (Config.get_Language(context).equals("persian")) {
-            for (int i = 0; i < languageModels.size(); i++) {
-                if (languageModels.get(i).getCulture().equals("fa")) {
-                    LCID = languageModels.get(i).getLCID();
+            if (languageModels.size() != 0) {
+                for (int i = 0; i < languageModels.size(); i++) {
+                    if (languageModels.get(i).getCulture().equals("fa")) {
+                        LCID = languageModels.get(i).getLCID();
+                    }
                 }
+            } else {
+                LCID = 1065;
             }
-            return LCID;
-        } else {
-            return LCID;
         }
+        return LCID;
+    }
+
+    public static String getCulture(Context context) {
+        String culture = "fa";
+
+        if (Config.get_Language(context).equals("english")) {
+            if (languageModels.size() != 0) {
+                for (int i = 0; i < languageModels.size(); i++) {
+                    if (languageModels.get(i).getCulture().equals("en")) {
+                        culture = languageModels.get(i).getCulture();
+                    }
+                }
+            } else {
+                culture = "en";
+            }
+        } else if (Config.get_Language(context).equals("persian")) {
+            if (languageModels.size() != 0) {
+                for (int i = 0; i < languageModels.size(); i++) {
+                    if (languageModels.get(i).getCulture().equals("fa")) {
+                        culture = languageModels.get(i).getCulture();
+                    }
+                }
+            } else {
+                culture = "fa";
+            }
+        }
+        return culture;
     }
 
     public static int getLanguageId(Context context) {
-
         int languageId = 1;
 
         if (Config.get_Language(context).equals("english")) {
-            for (int i = 0; i < languageModels.size(); i++) {
-                if (languageModels.get(i).getCulture().equals("en")) {
-                    languageId = languageModels.get(i).getLanguageId();
+            if (languageModels.size() != 0) {
+                for (int i = 0; i < languageModels.size(); i++) {
+                    if (languageModels.get(i).getCulture().equals("en")) {
+                        languageId = languageModels.get(i).getLanguageId();
+                    }
                 }
+            } else {
+                languageId = 2;
             }
-            return languageId;
         } else if (Config.get_Language(context).equals("persian")) {
-            for (int i = 0; i < languageModels.size(); i++) {
-                if (languageModels.get(i).getCulture().equals("fa")) {
-                    languageId = languageModels.get(i).getLanguageId();
+            if (languageModels.size() != 0) {
+                for (int i = 0; i < languageModels.size(); i++) {
+                    if (languageModels.get(i).getCulture().equals("fa")) {
+                        languageId = languageModels.get(i).getLanguageId();
+                    }
                 }
+            } else {
+                languageId = 1;
             }
-            return languageId;
-        } else {
-            return languageId;
         }
+        return languageId;
+
     }
 
     // LANGUAGE
@@ -323,5 +364,9 @@ public class Config extends Activity {
         return theme;
     }
 
+    public static void hideKeyboardFrom(Context context, View view) {
+        InputMethodManager imm = (InputMethodManager) context.getSystemService(Activity.INPUT_METHOD_SERVICE);
+        imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+    }
 
 }
