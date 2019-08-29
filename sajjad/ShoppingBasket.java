@@ -1,6 +1,7 @@
 package com.example.ssoheyli.ticketing_newdesign;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Build;
 import android.os.Bundle;
@@ -19,11 +20,13 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.ssoheyli.ticketing_newdesign.Financial.Test_PreInvoice_List;
 import com.example.ssoheyli.ticketing_newdesign.Helpfull.API;
 import com.example.ssoheyli.ticketing_newdesign.Helpfull.Config;
 import com.example.ssoheyli.ticketing_newdesign.Helpfull.ConnectionReceiver;
 import com.example.ssoheyli.ticketing_newdesign.Helpfull.Constans;
 import com.example.ssoheyli.ticketing_newdesign.Model.Model_Get_Basket_Amount;
+import com.example.ssoheyli.ticketing_newdesign.Model.Model_Get_Basket_Confirm;
 import com.example.ssoheyli.ticketing_newdesign.Model.Model_Get_Shopping_Basket;
 import com.example.ssoheyli.ticketing_newdesign.Model.Model_Post_Basket_Amount;
 import com.example.ssoheyli.ticketing_newdesign.Model.Model_Post_Basket_Confirm;
@@ -115,6 +118,22 @@ public class ShoppingBasket extends Activity implements SwipeRefreshLayout.OnRef
         API api = retrofit2.create(API.class);
         Model_Post_Basket_Confirm postModel = new Model_Post_Basket_Confirm();
         postModel.setToken(Config.getToken(this));
+        Call<Model_Get_Basket_Confirm> model = api.confirmBasket(postModel);
+        model.enqueue(new Callback<Model_Get_Basket_Confirm>() {
+            @Override
+            public void onResponse(Call<Model_Get_Basket_Confirm> call, Response<Model_Get_Basket_Confirm> response) {
+                if (response.isSuccessful()) {
+                    startActivity(new Intent(ShoppingBasket.this, Test_PreInvoice_List.class));
+                } else {
+                    Toast.makeText(ShoppingBasket.this, getString(R.string.confirm_basket), Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Model_Get_Basket_Confirm> call, Throwable t) {
+                Toast.makeText(ShoppingBasket.this, getString(R.string.confirm_basket), Toast.LENGTH_SHORT).show();
+            }
+        });
 
     }
 
